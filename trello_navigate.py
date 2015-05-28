@@ -44,12 +44,30 @@ class TrelloNavigateCommand(Navegable):
     def safe_work(self, connection):
         BoardOperation(connection.me).execute(self)
 
+class TrelloDeleteCardCommand(Navegable):
+    def safe_work(self, connection):
+        regions = self.view.sel()
+        for region in regions:
+            card_id = self.view.substr(region)
+            self.on_cached_operation(
+                lambda operation, list: operation.deferred_delete(card_id=card_id)
+            )
+
 class TrelloQuickCreateCardCommand(Navegable):
     def safe_work(self, connection):
-        self.on_cached_operation(
-            lambda operation, list: operation.get_name(label="Card name (on list %s/%s)" % (list.board.name, list.name))
-        )
-            
+        regions = self.view.sel()
+
+        # self.view.add_regions("mark",regions, "mark", "dot", self.HIDDEN)
+        for region in regions:
+            if not region.empty():
+                self.on_cached_operation(
+                    lambda operation, list: operation.deferred_add(text=self.view.substr(region), start = region.begin())
+                )
+        if(len(regions) == 1 and regions[0].empty()):
+            self.on_cached_operation(
+                lambda operation, list: operation.get_name(label="Card name (on list %s/%s)" % (list.board.name, list.name))
+            )
+
 class TrelloCreateCardWithDescriptionCommand(Navegable):
     def safe_work(self, connection):
         self.on_cached_operation(

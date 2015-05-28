@@ -1,3 +1,5 @@
+import sublime
+
 try:
     from executable import Executable
     from trello_collection import TrelloCollection
@@ -20,7 +22,7 @@ class BaseOperation(Executable):
 
     def after_init(self):
         pass
-
+        
     def items(self):
         self.set_collection()
         return self.custom_actions.encapsulate(self.collection.names())
@@ -43,15 +45,25 @@ class BaseOperation(Executable):
     def get_name(self, label="Name"):
         self.command.input(label, self.deferred_add)
 
-    def deferred_add(self, text = None):
+    def deferred_add(self, text = None, start = None):
         if text:
-            self.command.defer(lambda: self.base_add(text))
+            self.command.defer(lambda: self.base_add(text, start))
 
-    def base_add(self, text):
-        self.add(text)
+    def base_add(self, text, start = None):
+        self.add(text, start)
         self.restart()
 
-    def add(self, text):
+    def add(self, text, start = None):
+        pass
+
+    def deferred_delete(self, card_id):
+        self.command.defer(lambda: self.base_delete(card_id))
+
+    def base_delete(self, card_id):
+        self.delete(card_id)
+        self.restart()
+
+    def delete(card_id):
         pass
 
     def restart(self):
@@ -79,7 +91,7 @@ class BoardOperation(BaseOperation):
     def next_operation_class(self):
         return ListOperation
 
-    def add(self, text):
+    def add(self, text, start = None):
         self.trello_element.add_board(text)
 
 class ListOperation(BaseOperation):
@@ -89,7 +101,7 @@ class ListOperation(BaseOperation):
     def next_operation_class(self):
         return CardOperation
 
-    def add(self, text):
+    def add(self, text, start = None):
         self.trello_element.add_list(text)
 
 class CardOperation(BaseOperation):
@@ -105,6 +117,7 @@ class CardOperation(BaseOperation):
     def next_operation_class(self):
         return CardOptions
 
+
     def create_with_description(self, label=""):
         first  = "Replace this with the card name. The card will be saved when this tab is closed, leave this tab empty to cancel"
         middle = "Replace this with the card description, it can be multiline."
@@ -117,9 +130,17 @@ class CardOperation(BaseOperation):
             name, description = self.split_card_contents(card)
             self.add(name, description)
         self.restart()
+        
+    def add(self, text, start = None, description = None):
+        card = self.trello_element.add_card(text, description)
+        self.command.view.run_command("insert", {"characters": "Trello #"+card._id+": "+text})
 
-    def add(self, text, description = None):
-        self.trello_element.add_card(text, description)
+    def delete(self, card_id):
+        card = self.trello_element._conn.get_card(card_id)
+        card.delete()
+        self.command.view.run_command("expand_selection", {"to": "line"})
+        self.command.view.run_command("left_delete")
+
 
     def split_cards(self, content):
         return content.split(self.command.card_delimiter + "\n") if self.command.card_delimiter else [content]

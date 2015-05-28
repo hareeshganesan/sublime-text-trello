@@ -22,4 +22,8 @@
   "id": "trellocreatecardwithdescription",
   "caption": "Trello: Create card with description",
   "command": "trello_create_card_with_description"
+}, {
+  "id": "trellodeletecard",
+  "caption": "Trello: Delete card",
+  "command": "trello_delete_card"
 }]
