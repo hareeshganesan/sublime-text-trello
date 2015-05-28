@@ -26,4 +26,9 @@
   "id": "trellodeletecard",
   "caption": "Trello: Delete card",
   "command": "trello_delete_card"
+}, {
+  "id": "trelloopeninbrowser",
+  "caption": "Trello: Open in Browser",
+  "command": "trello_open_in_browser"
 }]
+

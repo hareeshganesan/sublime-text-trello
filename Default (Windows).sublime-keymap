@@ -1,4 +1,7 @@
 [
     { "keys": ["ctrl+alt+t"], "command": "trello_navigate" },
-    { "keys": ["ctrl+alt+n"], "command": "trello_unread_notifications" }
+    { "keys": ["ctrl+alt+n"], "command": "trello_unread_notifications" },
+    { "keys": ["ctrl+alt+h"], "command": "trello_quick_create_card" },
+    { "keys": ["ctrl+alt+r"], "command": "trello_delete_card" },
+    { "keys": ["ctrl+alt+o"], "command": "trello_open_in_browser" }
 ]

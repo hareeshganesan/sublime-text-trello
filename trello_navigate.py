@@ -40,6 +40,15 @@ class Navegable(TrelloCommand):
             trello_element = operation.trello_element
             fn(operation, trello_element)
 
+class TrelloOpenInBrowserCommand(Navegable):
+    def safe_work(self, connection):
+        regions = self.view.sel()
+        for region in regions:
+            if not region.empty():
+                card = connection.get_card(self.view.substr(region))
+                print(self.view.substr(region))
+                CardOperation(card).open_in_browser()
+
 class TrelloNavigateCommand(Navegable):
     def safe_work(self, connection):
         BoardOperation(connection.me).execute(self)

@@ -79,7 +79,10 @@ class BaseOperation(Executable):
         pass
 
     def open_in_browser(self):
-        self.command.defer(super().open_in_browser)
+        if(hasattr(self, 'command')):
+            self.command.defer(super().open_in_browser)
+        else:
+            super().open_in_browser()
 
 class BoardOperation(BaseOperation):
     def after_init(self):
